@@ -22,19 +22,13 @@ with open('CREDENTIALS') as f:
 test_channel = -1001459876114
 debug_group = CREDENTIALS.get('debug_group') or -1001198682178
 
-def autoDistroy(msg):
-    threading.Timer(10, lambda: msg.delete()).start() # destroy after 10s 
-
 def manage(update, context):
     try:
-        print('here')
-        print(update)
         chat_id = update.effective_chat and update.effective_chat.id
         if not chat_id:
             return
         if not db.hasChatId(chat_id):
             db.addChatId(chat_id)
-            autoDistroy(update.effective_chat.send_message(text = "Ack"))
         db.setTime(chat_id)
     except Exception as e:
         updater.bot.send_message(chat_id=debug_group, text=str(e))    
@@ -80,8 +74,7 @@ def loopImp():
                 if str(e) in ['Message to forward not found', "Message can't be forwarded"]:
                     pos = db.iteratePos(chat_id)
                 else: 
-                    print('fail, pos ' + str(e))
-                    # print(e) # work here
+                    updater.bot.send_message(chat_id=debug_group, text=str(e))
                     break
 
 def loop():
@@ -94,7 +87,7 @@ def loop():
             updater.bot.send_message(chat_id=debug_group, text=str(e))
         except:
             pass
-    threading.Timer(5, loop).start() # test, change to 3600
+    threading.Timer(3600, loop).start()
 
 threading.Timer(1, loop).start()
 

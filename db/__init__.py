@@ -4,7 +4,7 @@ import time
 
 # feature request: customize revive interval
 
-DEFAULT_INTERVAL = 1 # 1440
+DEFAULT_INTERVAL = 1440
 
 class DB(object):
     def __init__(self):
@@ -26,7 +26,7 @@ class DB(object):
 
     def ready(self, chat_id):
         return self.DB[chat_id]['last_update'] < \
-            time.time() - 10 # self.DB[chat_id].get('interval', DEFAULT_INTERVAL) * 60
+            time.time() - self.DB[chat_id].get('interval', DEFAULT_INTERVAL) * 60
 
     def hasChatId(self, chat_id):
         return chat_id in self.DB
