@@ -16,6 +16,10 @@ class DB(object):
             tb.print_exc()
             self.DB = {}
 
+    def rewindPos(self, chat_id):
+        self.DB[chat_id]['pos'] -= 1
+        self.save()
+
     def iteratePos(self, chat_id):
         self.DB[chat_id]['pos'] += 1
         self.save()

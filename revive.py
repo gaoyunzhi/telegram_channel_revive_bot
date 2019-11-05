@@ -64,6 +64,9 @@ def loopImp():
             try:
                 r = updater.bot.forward_message(
                     chat_id = test_channel, message_id = pos, from_chat_id = chat_id)
+                if time.time() - r.forward_date < 10 * 60 * 60 * 24:
+                    db.rewindPos(chat_id)
+                    break
                 if not valid(r):
                     continue
                 updater.bot.send_message(
