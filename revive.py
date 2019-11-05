@@ -59,7 +59,7 @@ def loopImp():
     for chat_id in db.chatIds():
         if (not db.ready(chat_id)) or chat_id in [debug_group, test_channel]:
             continue
-        while True:
+        for _ in xrange(10):
             pos = db.iteratePos(chat_id)
             try:
                 r = updater.bot.forward_message(
