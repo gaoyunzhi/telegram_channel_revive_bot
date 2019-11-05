@@ -1,10 +1,8 @@
-# telegram_channel_subscription_v2_bot
+# telegram_channel_revive_bot
 
-Subscribe messages from public channels. 
+Loop old messages if no activity in a period of time (e.g. 1 day).
 
-You are also welcome to use my [@channel_subscription_v2_bot](https://t.me/channel_subscription_v2_bot) without create your own bot.
-
-Feedback / feature requests are welcomed at [@dushufenxiang_chat](https://t.me/dushufenxiang_chat).
+You are also welcome to use my [@channel_revive_bot](https://t.me/channel_revive_bot) without create your own bot.
 
 ## how to install
 
@@ -14,29 +12,15 @@ Once you get the token, run `python3 setup.py`.
 
 The bot will automatically be running at the end of setup.
 
-## feature
-
-Subscribe by key words.
-Subscription pool is shared.
-
 ## bot description
 
-Subscribe messages from public channels. 
+Add this bot to your public channel, it will loop through the old message gradually if no activity in a set period of time.
 
-add - /add channel_link add channel to subscription pool. Channel must have public name. Automatically subscribe this channel if messge is send in a group or channel.
-list - /list: list all channels.
-show_keys - /show_keys: show subscription keywords
-keys - /keys keywords: give a new set of keywords, in json format
-remove - /remove index: remove channel in the pool. Bot admin only.
+Command:
+/channel_revive_bot_set_interval_minutes: /channel_revive_bot_set_interval_minutes x, set channel revive interval to x minutes. default is 1440.
 
-Feedback / feature requests are welcomed at @dushufenxiang_chat.
-
-Github: https://github.com/gaoyunzhi/telegram_channel_subscription_v2
+Github: https://github.com/gaoyunzhi/telegram_channel_revive
 
 ## bot about 
 
-Subscribe messages from public channels. 
-
-## notes
-
-Part of DB public by design.
+Add this bot to your public channel, it will loop through the old message gradually if no activity in a set period of time.
