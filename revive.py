@@ -8,6 +8,7 @@ import time
 from telegram.ext import Updater, MessageHandler, Filters
 from db import DB
 import threading
+import traceback as tb
 
 START_MESSAGE = ('''
 Add this bot to your public channel, it will loop through the old message gradually 
@@ -59,12 +60,12 @@ def loopImp():
     for chat_id in db.chatIds():
         if (not db.ready(chat_id)) or chat_id in [debug_group, test_channel]:
             continue
-        for _ in xrange(10):
+        for _ in range(10):
             pos = db.iteratePos(chat_id)
             try:
                 r = updater.bot.forward_message(
                     chat_id = test_channel, message_id = pos, from_chat_id = chat_id)
-                if time.time() - r.forward_date < 10 * 60 * 60 * 24:
+                if time.time() - time.mktime(r.forward_date.timetuple()) < 10 * 60 * 60 * 24:
                     db.rewindPos(chat_id)
                     break
                 if not valid(r):
@@ -76,9 +77,8 @@ def loopImp():
             except Exception as e:
                 if str(e) in ['Message to forward not found', "Message can't be forwarded"]:
                     pos = db.iteratePos(chat_id)
-                else: 
-                    updater.bot.send_message(chat_id=debug_group, text=str(e))
-                    break
+                else:
+                    raise e
 
 def loop():
     try:
