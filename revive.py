@@ -78,7 +78,7 @@ def loopImp():
                     continue
                 if r.photo:
                     updater.bot.forward_message(
-                        chat_id = test_channel, message_id = pos, from_chat_id = chat_id)
+                        chat_id = chat_id, message_id = pos, from_chat_id = chat_id)
                 else:
                     updater.bot.send_message(
                         chat_id = chat_id, text = r.text, photo = r.photo)
