@@ -24,10 +24,26 @@ with open('CREDENTIALS') as f:
 test_channel = -1001459876114
 debug_group = CREDENTIALS.get('debug_group') or -1001198682178
 
+def valid(r):
+    if r.media_group_id:
+        return False
+    if r.photo:
+        return True
+    if not r.text:
+        return False
+    if r.text.startswith('/'):
+        return False
+    if len(r.text) < 10:
+        return False
+    return True
+
 def manage(update, context):
     try:
         chat_id = update.effective_chat and update.effective_chat.id
         if not chat_id:
+            return
+        msg = update.effective_message
+        if (not msg) or (not valid(msg)):
             return
         if not db.hasChatId(chat_id):
             db.addChatId(chat_id)
@@ -46,19 +62,6 @@ dp = updater.dispatcher
 dp.add_handler(MessageHandler(~Filters.private, manage))
 dp.add_handler(MessageHandler(Filters.private, start))
 
-def valid(r):
-    if r.media_group_id:
-        return False
-    if r.photo:
-        return True
-    if not r.text:
-        return False
-    if r.text.startswith('/'):
-        return False
-    if len(r.text) < 10:
-        return False
-    return True
-
 def loopImp():
     for chat_id in db.chatIds():
         if (not db.ready(chat_id)) or (chat_id in [debug_group, test_channel]):
@@ -73,9 +76,12 @@ def loopImp():
                     break
                 if not valid(r):
                     continue
-                print(r)
-                updater.bot.send_message(
-                    chat_id = chat_id, text = r.text, photo = r.photo)
+                if r.photo:
+                    updater.bot.send_photo(
+                        chat_id = chat_id, caption = r.text, photo = r.photo)
+                else:
+                    updater.bot.send_message(
+                        chat_id = chat_id, text = r.text, photo = r.photo)
                 db.setTime(chat_id)
                 break
             except Exception as e:
