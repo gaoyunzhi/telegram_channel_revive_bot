@@ -9,6 +9,7 @@ from telegram.ext import Updater, MessageHandler, Filters
 from db import DB
 import threading
 import traceback as tb
+from datetime import datetime
 
 START_MESSAGE = ('''
 Add this bot to your public channel, it will loop through the old message gradually 
@@ -67,11 +68,12 @@ def loopImp():
             try:
                 r = updater.bot.forward_message(
                     chat_id = test_channel, message_id = pos, from_chat_id = chat_id)
-                if time.time() - time.mktime(r.forward_date.timetuple()) < 10 * 60 * 60 * 24:
+                if time.time() - datetime.timestamp(r.forward_date) < 10 * 60 * 60 * 24:
                     db.rewindPos(chat_id)
                     break
                 if not valid(r):
                     continue
+                print(r)
                 updater.bot.send_message(
                     chat_id = chat_id, text = r.text, photo = r.photo)
                 db.setTime(chat_id)
