@@ -77,8 +77,8 @@ def loopImp():
                 if not valid(r):
                     continue
                 if r.photo:
-                    updater.bot.send_photo(
-                        chat_id = chat_id, caption = r.text, photo = r.photo)
+                    updater.bot.forward_message(
+                        chat_id = test_channel, message_id = pos, from_chat_id = chat_id)
                 else:
                     updater.bot.send_message(
                         chat_id = chat_id, text = r.text, photo = r.photo)
