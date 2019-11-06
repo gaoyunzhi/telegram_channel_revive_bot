@@ -46,6 +46,8 @@ dp.add_handler(MessageHandler(~Filters.private, manage))
 dp.add_handler(MessageHandler(Filters.private, start))
 
 def valid(r):
+    if r.media_group_id:
+        return False
     if r.photo:
         return True
     if not r.text:
@@ -58,7 +60,7 @@ def valid(r):
 
 def loopImp():
     for chat_id in db.chatIds():
-        if (not db.ready(chat_id)) or chat_id in [debug_group, test_channel]:
+        if (not db.ready(chat_id)) or (chat_id in [debug_group, test_channel]):
             continue
         for _ in range(10):
             pos = db.iteratePos(chat_id)
