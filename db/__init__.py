@@ -32,15 +32,10 @@ class DB(object):
         return self.DB[chat_id]['last_update'] < \
             time.time() - self.DB[chat_id].get('interval', DEFAULT_INTERVAL) * 60
 
-    def hasChatId(self, chat_id):
-        return chat_id in self.DB
-
     def setTime(self, chat_id):
+        if chat_id not in self.DB:
+            self.DB[chat_id] = {'pos': -1}    
         self.DB[chat_id]['last_update'] = time.time()
-        self.save()
-
-    def addChatId(self, chat_id):
-        self.DB[chat_id] = {'pos': -1, 'last_update': time.time()}
         self.save()
 
     def save(self):
