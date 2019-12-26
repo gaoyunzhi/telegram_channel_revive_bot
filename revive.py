@@ -60,7 +60,7 @@ def loopImp():
                     break
                 if not isMeaningful(r):
                     continue
-                if r.photo:
+                if r.photo or r.document:
                     tele.bot.forward_message(
                         chat_id = chat_id, message_id = pos, from_chat_id = chat_id)
                 else:
