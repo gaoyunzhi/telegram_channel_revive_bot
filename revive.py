@@ -33,8 +33,10 @@ def manage(update, context):
     if not msg:
         return
     command, text = splitCommand(msg.text)
+    print(command, text)
     if 'interval' in command:
         db.setInterval(chat_id, int(text))
+        msg.delete()
         return
     db.setTime(chat_id)
 
