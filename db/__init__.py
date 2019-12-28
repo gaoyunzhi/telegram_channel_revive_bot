@@ -34,6 +34,7 @@ class DB(object):
         if chat_id not in self.DB:
             self.DB[chat_id] = {'pos': -1}   
         self.DB[chat_id]['interval'] = hour
+        self.save()
 
     def setTime(self, chat_id):
         if chat_id not in self.DB:
