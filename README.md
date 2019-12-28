@@ -17,9 +17,11 @@ The bot will automatically be running at the end of setup.
 Add this bot to your public channel, it will loop through the old message gradually if no activity in a set period of time.
 
 Command:
-/channel_revive_bot_set_interval_minutes: /channel_revive_bot_set_interval_minutes x, set channel revive interval to x minutes. default is 1440.
+/interval: /interval x, set channel revive interval to x hour. default is 24.
 
 Github: https://github.com/gaoyunzhi/telegram_channel_revive
+
+More projects: https://t.me/useless_project_ideas
 
 ## bot about 
 
