@@ -34,7 +34,6 @@ def manage(update, context):
         return
     command, text = splitCommand(msg.text)
     if 'interval' in command:
-        print(command, text)
         db.setInterval(chat_id, int(text))
         msg.delete()
         return
