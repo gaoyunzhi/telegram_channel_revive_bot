@@ -30,7 +30,7 @@ def manage(update, context):
     if not chat_id:
         return
     msg = update.effective_message
-    if (not msg) or (not isMeaningful(msg)):
+    if not msg:
         return
     db.setTime(chat_id)
 
