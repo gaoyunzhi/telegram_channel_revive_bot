@@ -7,7 +7,7 @@ from telegram.ext import Updater, MessageHandler, Filters
 from db import DB
 import threading
 from datetime import datetime
-from telegram_util import log_on_fail, isMeaningful
+from telegram_util import log_on_fail, isMeaningful, splitCommand
 
 START_MESSAGE = ('''
 Add this bot to your public channel, it will loop through the old message gradually 
@@ -31,6 +31,10 @@ def manage(update, context):
         return
     msg = update.effective_message
     if not msg:
+        return
+    command, text = splitCommand(msg.text)
+    if 'interval' in command:
+        db.setInterval(chat_id, int(text))
         return
     db.setTime(chat_id)
 

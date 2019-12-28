@@ -2,9 +2,7 @@ import traceback as tb
 import yaml
 import time
 
-# feature request: customize revive interval
-
-DEFAULT_INTERVAL = 1440
+DEFAULT_INTERVAL = 24
 
 class DB(object):
     def __init__(self):
@@ -31,6 +29,11 @@ class DB(object):
     def ready(self, chat_id):
         return self.DB[chat_id]['last_update'] < \
             time.time() - self.DB[chat_id].get('interval', DEFAULT_INTERVAL) * 60 * 60
+
+    def setInterval(self, chat_id, hour):
+        if chat_id not in self.DB:
+            self.DB[chat_id] = {'pos': -1}   
+        self.DB[chat_id]['interval'] = hour
 
     def setTime(self, chat_id):
         if chat_id not in self.DB:
