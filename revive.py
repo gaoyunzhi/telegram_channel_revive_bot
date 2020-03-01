@@ -66,11 +66,8 @@ def loopImp():
                     break
                 if not isMeaningful(r):
                     continue
-                if r.photo or r.document or r.video:
-                    tele.bot.forward_message(
-                        chat_id = chat_id, message_id = pos, from_chat_id = chat_id)
-                else:
-                    tele.bot.send_message(chat_id = chat_id, text = r.text)
+                tele.bot.forward_message(
+                    chat_id = chat_id, message_id = pos, from_chat_id = chat_id)
                 db.setTime(chat_id)
                 break
             except Exception as e:
