@@ -80,6 +80,8 @@ def loopImp():
     for chat_id in db.chatIds():
         if (not db.ready(chat_id)) or (chat_id in [debug_group.id]):
             continue
+        if chat_id != -1001323905001:
+            continue
         for _ in range(10):
             pos = db.iteratePos(chat_id)
             print(chat_id, tele.bot.get_chat(chat_id).title)
@@ -90,9 +92,6 @@ def loopImp():
                 db.iteratePos(chat_id)
             # except:
             #     continue
-            if len(r) == 1: # debug use only
-                db.rewindPos(chat_id)
-                r[0].delete() # probably still not enough, let's see
             db.setTime(chat_id)
             break
 
