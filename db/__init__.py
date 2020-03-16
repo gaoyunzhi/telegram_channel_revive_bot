@@ -3,6 +3,7 @@ import yaml
 import time
 
 DEFAULT_INTERVAL = 24
+HOUR = 60 * 60
 
 class DB(object):
     def __init__(self):
@@ -28,7 +29,7 @@ class DB(object):
 
     def ready(self, chat_id):
         return self.DB[chat_id]['last_update'] < \
-            time.time() - self.DB[chat_id].get('interval', DEFAULT_INTERVAL) * 60 * 60
+            time.time() - self.DB[chat_id].get('interval', DEFAULT_INTERVAL) * HOUR
 
     def setInterval(self, chat_id, hour):
         if chat_id not in self.DB:

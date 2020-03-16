@@ -4,9 +4,8 @@
 import yaml
 import time
 from telegram.ext import Updater, MessageHandler, Filters
-from db import DB
+from db import DB, HOUR
 import threading
-from datetime import datetime
 from telegram_util import log_on_fail, splitCommand, autoDestroy
 from telegram import InputMediaPhoto
 
@@ -33,7 +32,7 @@ def manage(update, context):
     command, text = splitCommand(msg.text)
     if 'interval' in command:
         db.setInterval(chat_id, int(text))
-        autoDestroy(msg.reply_text('success'))
+        autoDestroy(msg.reply_text('success'), 0.1)
         msg.delete()
         return
     db.setTime(chat_id)
@@ -42,10 +41,8 @@ def start(update, context):
     if update.message:
         update.message.reply_text(START_MESSAGE, quote=False)
 
-dp = tele.dispatcher
-dp.add_handler(MessageHandler(~Filters.private, manage))
-dp.add_handler(MessageHandler(Filters.private, start))
-
+tele.dispatcher.add_handler(MessageHandler(~Filters.private, manage))
+tele.dispatcher.add_handler(MessageHandler(Filters.private, start))
 
 def addMediaGroup(group, r, group_id):
     if r.media_group_id != group_id:
@@ -68,12 +65,12 @@ def forwardMsg(reciever, sender, pos):
     group = []
     addMediaGroup(group, r)
     for np in range(pos + 1, pos + 9):
-        try:
-            r = bot.forward_message(chat_id = reciever, 
-                from_chat_id = sender, message_id = np)
-            r.delete()
-        except Exception as e:
-            break
+        # try:
+        r = bot.forward_message(chat_id = reciever, 
+            from_chat_id = sender, message_id = np)
+        r.delete()
+        # except Exception as e:
+        #     break
         if not addMediaGroup(group, r, group_id):
             break
     return bot.send_media_group(reciever, group)
@@ -85,21 +82,23 @@ def loopImp():
             continue
         for _ in range(10):
             pos = db.iteratePos(chat_id)
-            try:
-                r = forwardMsg(chat_id, chat_id, pos)
-                for _ in range(len(r) - 1):
-                    db.iteratePos(chat_id)
-            except:
-                continue
+            print(chat_id)
+            print('t.me/%s/%d' % (tele.bot.get_chat(chat_id).username, pos))
+            # try:
+            r = forwardMsg(chat_id, chat_id, pos)
+            for _ in range(len(r) - 1):
+                db.iteratePos(chat_id)
+            # except:
+            #     continue
             if len(r) == 1: # debug use only
                 db.rewindPos(chat_id)
-                r.delete() # probably still not enough, let's see
+                r[0].delete() # probably still not enough, let's see
             db.setTime(chat_id)
             break
 
 def loop():
     loopImp()
-    threading.Timer(3600, loop).start()
+    threading.Timer(HOUR, loop).start()
 
 threading.Timer(1, loop).start()
 
