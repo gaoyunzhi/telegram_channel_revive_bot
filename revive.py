@@ -54,22 +54,15 @@ def loopImp():
             pos = db.iteratePos(chat_id)
             try:
                 r = tele.bot.forward_message(
-                    chat_id = debug_group.id, message_id = pos, from_chat_id = chat_id)
-                if r.forward_date == None:
-                    print(r)
-                    continue
-                if time.time() - datetime.timestamp(r.forward_date) < 10 * 60 * 60 * 24:
-                    db.rewindPos(chat_id)
-                    break
-                tele.bot.forward_message(
                     chat_id = chat_id, message_id = pos, from_chat_id = chat_id)
+            except:
+                continue
+            if time.time() - datetime.timestamp(r.forward_date) < 10 * 60 * 60 * 24:
+                db.rewindPos(chat_id)
+                r.delete()
+            else:
                 db.setTime(chat_id)
-                break
-            except Exception as e:
-                if str(e) in ['Message to forward not found', "Message can't be forwarded"]:
-                    continue
-                else:
-                    raise e
+            break
 
 def loop():
     loopImp()
