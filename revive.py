@@ -48,11 +48,7 @@ tele.dispatcher.add_handler(MessageHandler(~Filters.private, manage))
 tele.dispatcher.add_handler(MessageHandler(Filters.private, start))
 
 def getAllPos(link):
-    print('test' in str(sys.argv))
-    s = BeautifulSoup(cached_url.get(link + '?embed=1',
-        headers={
-            'referer': link,
-        }), 'html.parser')
+    s = BeautifulSoup(cached_url.get(link + '?embed=1'), 'html.parser')
     result = []
     for a in s.find_all('a', class_='grouped_media_wrap'):
         new_link = a.get('href', '').strip()
@@ -64,7 +60,6 @@ def forwardMsg(reciever, sender, pos, bot, debug_group):
     link = 'https://t.me/%s/%d' % \
         (tele.bot.get_chat(sender).username, pos)
     all_pos = getAllPos(link)
-    print(all_pos)
     if not all_pos:
         try:
             return [bot.forward_message(chat_id = reciever, 
@@ -89,8 +84,6 @@ def forwardMsg(reciever, sender, pos, bot, debug_group):
 def loopImp():
     for chat_id in db.chatIds():
         if (not db.ready(chat_id)) or (chat_id in [debug_group.id]):
-            continue
-        if chat_id != -1001341438972: # testing
             continue
         for _ in range(10):
             pos = db.iteratePos(chat_id)
