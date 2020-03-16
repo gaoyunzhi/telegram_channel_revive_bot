@@ -55,7 +55,7 @@ def getAllPos(link):
 
 def forwardMsg(reciever, sender, pos, bot, debug_group):
     link = 'https://t.me/%s/%d' % \
-        (tele.bot.get_chat(chat_id).username, pos)
+        (tele.bot.get_chat(sender).username, pos)
     all_pos = getAllPos(link)
     print(all_pos)
     if not all_pos:
