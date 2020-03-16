@@ -82,7 +82,7 @@ def loopImp():
             continue
         for _ in range(10):
             pos = db.iteratePos(chat_id)
-            print(chat_id)
+            print(chat_id, tele.bot.get_chat(chat_id).title)
             print('t.me/%s/%d' % (tele.bot.get_chat(chat_id).username, pos))
             # try:
             r = forwardMsg(chat_id, chat_id, pos)

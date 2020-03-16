@@ -3,7 +3,7 @@ import yaml
 import time
 
 DEFAULT_INTERVAL = 24
-HOUR = 60 * 60
+HOUR = 1 # 60 * 60
 
 class DB(object):
     def __init__(self):
