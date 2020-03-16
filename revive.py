@@ -7,7 +7,7 @@ from telegram.ext import Updater, MessageHandler, Filters
 from db import DB
 import threading
 from datetime import datetime
-from telegram_util import log_on_fail, isMeaningful, splitCommand, autoDestroy
+from telegram_util import log_on_fail, splitCommand, autoDestroy
 
 START_MESSAGE = ('''
 Add this bot to your public channel, it will loop through the old message gradually 
@@ -61,8 +61,6 @@ def loopImp():
                 if time.time() - datetime.timestamp(r.forward_date) < 10 * 60 * 60 * 24:
                     db.rewindPos(chat_id)
                     break
-                if not isMeaningful(r):
-                    continue
                 tele.bot.forward_message(
                     chat_id = chat_id, message_id = pos, from_chat_id = chat_id)
                 db.setTime(chat_id)
