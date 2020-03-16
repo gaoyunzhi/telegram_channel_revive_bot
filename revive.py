@@ -8,6 +8,7 @@ from db import DB, HOUR
 import threading
 from telegram_util import log_on_fail, splitCommand, autoDestroy
 from telegram import InputMediaPhoto
+from bs4 import BeautifulSoup
 
 START_MESSAGE = ('''
 Add this bot to your public channel, it will loop through the old message gradually 
@@ -56,21 +57,26 @@ def addMediaGroup(group, r, group_id):
     return True
 
 def forwardMsg(reciever, sender, pos):
-    r = tele.bot.forward_message(
-        chat_id = reciever, message_id = pos, from_chat_id = sender)
+    try:
+        r = tele.bot.forward_message(
+            chat_id = reciever, message_id = pos, from_chat_id = sender)
+    except:
+        return []
+    if r.photo:
+        print(r.photo[-1].file_id)
     group_id = r.media_group_id
     if not group_id:
         return [r]
     r.delete()
     group = []
-    addMediaGroup(group, r)
+    addMediaGroup(group, r, group_id)
     for np in range(pos + 1, pos + 9):
-        # try:
-        r = bot.forward_message(chat_id = reciever, 
-            from_chat_id = sender, message_id = np)
+        try:
+            r = bot.forward_message(chat_id = reciever, 
+                from_chat_id = sender, message_id = np)
+        except:
+            break
         r.delete()
-        # except Exception as e:
-        #     break
         if not addMediaGroup(group, r, group_id):
             break
     return bot.send_media_group(reciever, group)
@@ -80,18 +86,14 @@ def loopImp():
     for chat_id in db.chatIds():
         if (not db.ready(chat_id)) or (chat_id in [debug_group.id]):
             continue
-        if chat_id != -1001323905001:
+        if chat_id != -1001341438972: # testing
             continue
         for _ in range(10):
             pos = db.iteratePos(chat_id)
-            print(chat_id, tele.bot.get_chat(chat_id).title)
-            print('t.me/%s/%d' % (tele.bot.get_chat(chat_id).username, pos))
-            # try:
+            link = 'https://t.me/%s/%d' % (tele.bot.get_chat(chat_id).username, pos)
             r = forwardMsg(chat_id, chat_id, pos)
             for _ in range(len(r) - 1):
                 db.iteratePos(chat_id)
-            # except:
-            #     continue
             db.setTime(chat_id)
             break
 
