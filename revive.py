@@ -19,10 +19,7 @@ db = DB()
 with open('CREDENTIALS') as f:
     CREDENTIALS = yaml.load(f, Loader=yaml.FullLoader)
 tele = Updater(CREDENTIALS['bot_token'], use_context=True)
-r = tele.bot.send_message(-1001198682178, 'start')
-r.delete()
-debug_group = r.chat
-test_channel = -1001459876114
+debug_group = tele.bot.get_chat(-1001198682178)
 
 @log_on_fail(debug_group)
 def manage(update, context):
@@ -51,13 +48,13 @@ dp.add_handler(MessageHandler(Filters.private, start))
 @log_on_fail(debug_group)
 def loopImp():
     for chat_id in db.chatIds():
-        if (not db.ready(chat_id)) or (chat_id in [debug_group.id, test_channel]):
+        if (not db.ready(chat_id)) or (chat_id in [debug_group.id]):
             continue
         for _ in range(10):
             pos = db.iteratePos(chat_id)
             try:
                 r = tele.bot.forward_message(
-                    chat_id = test_channel, message_id = pos, from_chat_id = chat_id)
+                    chat_id = debug_group.id, message_id = pos, from_chat_id = chat_id)
                 if r.forward_date == None:
                     print(r)
                     continue
