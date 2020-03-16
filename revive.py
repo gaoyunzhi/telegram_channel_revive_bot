@@ -9,6 +9,7 @@ import threading
 from telegram_util import log_on_fail, splitCommand, autoDestroy
 from telegram import InputMediaPhoto
 from bs4 import BeautifulSoup
+import cached_url
 
 START_MESSAGE = ('''
 Add this bot to your public channel, it will loop through the old message gradually 
@@ -45,40 +46,36 @@ def start(update, context):
 tele.dispatcher.add_handler(MessageHandler(~Filters.private, manage))
 tele.dispatcher.add_handler(MessageHandler(Filters.private, start))
 
-def addMediaGroup(group, r, group_id):
-    if r.media_group_id != group_id:
-        return False
-    m = InputMediaPhoto(r.photo[-1].file_id, 
-        caption=r.caption_markdown, parse_mode='Markdown')
-    if r.caption_markdown:
-        group = [m] + group
-    else:
-        group.append(m)
-    return True
+def getAllPos(link):
+    s = BeautifulSoup(cached_url.get(link), 'html.parser')
+    result = []
+    for a in s.find_all('a', class_='grouped_media_wrap'):
+        result.append(int(a.get('href', '').strip().split('/')[-1]))
+    return sorted(result)
 
-def forwardMsg(reciever, sender, pos):
-    try:
-        r = tele.bot.forward_message(
-            chat_id = reciever, message_id = pos, from_chat_id = sender)
-    except:
-        return []
-    if r.photo:
-        print(r.photo[-1].file_id)
-    group_id = r.media_group_id
-    if not group_id:
-        return [r]
-    r.delete()
-    group = []
-    addMediaGroup(group, r, group_id)
-    for np in range(pos + 1, pos + 9):
+def forwardMsg(reciever, sender, pos, bot, debug_group):
+    link = 'https://t.me/%s/%d' % \
+        (tele.bot.get_chat(chat_id).username, pos)
+    all_pos = getAllPos(link)
+    print(all_pos)
+    if not all_pos:
         try:
-            r = bot.forward_message(chat_id = reciever, 
-                from_chat_id = sender, message_id = np)
+            r = bot.forward_message(
+                chat_id = reciever, message_id = pos, from_chat_id = sender)
         except:
-            break
+            return []
+            
+    group = []
+    for np in all_pos:
+        r = bot.forward_message(chat_id = debug_group.id, 
+            from_chat_id = sender, message_id = np)
         r.delete()
-        if not addMediaGroup(group, r, group_id):
-            break
+        m = InputMediaPhoto(r.photo[-1].file_id, 
+            caption=r.caption_markdown, parse_mode='Markdown')
+        if r.caption_markdown:
+            group = [m] + group
+        else:
+            group.append(m)
     return bot.send_media_group(reciever, group)
 
 @log_on_fail(debug_group)
@@ -90,8 +87,9 @@ def loopImp():
             continue
         for _ in range(10):
             pos = db.iteratePos(chat_id)
-            link = 'https://t.me/%s/%d' % (tele.bot.get_chat(chat_id).username, pos)
-            r = forwardMsg(chat_id, chat_id, pos)
+            r = forwardMsg(chat_id, chat_id, pos, tele.bot, debug_group)
+            if not r:
+                continue
             for _ in range(len(r) - 1):
                 db.iteratePos(chat_id)
             db.setTime(chat_id)
