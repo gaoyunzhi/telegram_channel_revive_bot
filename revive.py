@@ -8,6 +8,7 @@ from db import DB
 import threading
 from datetime import datetime
 from telegram_util import log_on_fail, splitCommand, autoDestroy
+from telegram import InputMediaPhoto
 
 START_MESSAGE = ('''
 Add this bot to your public channel, it will loop through the old message gradually 
@@ -45,6 +46,38 @@ dp = tele.dispatcher
 dp.add_handler(MessageHandler(~Filters.private, manage))
 dp.add_handler(MessageHandler(Filters.private, start))
 
+
+def addMediaGroup(group, r, group_id):
+    if r.media_group_id != group_id:
+        return False
+    m = InputMediaPhoto(r.photo[-1].file_id, 
+        caption=r.caption_markdown, parse_mode='Markdown')
+    if r.caption_markdown:
+        group = [m] + group
+    else:
+        group.append(m)
+    return True
+
+def forwardMsg(reciever, sender, pos):
+    r = tele.bot.forward_message(
+        chat_id = reciever, message_id = pos, from_chat_id = sender)
+    group_id = r.media_group_id
+    if not group_id:
+        return [r]
+    r.delete()
+    group = []
+    addMediaGroup(group, r)
+    for np in range(pos + 1, pos + 9):
+        try:
+            r = bot.forward_message(chat_id = reciever, 
+                from_chat_id = sender, message_id = np)
+            r.delete()
+        except Exception as e:
+            break
+        if not addMediaGroup(group, r, group_id):
+            break
+    return bot.send_media_group(reciever, group)
+
 @log_on_fail(debug_group)
 def loopImp():
     for chat_id in db.chatIds():
@@ -53,15 +86,15 @@ def loopImp():
         for _ in range(10):
             pos = db.iteratePos(chat_id)
             try:
-                r = tele.bot.forward_message(
-                    chat_id = chat_id, message_id = pos, from_chat_id = chat_id)
+                r = forwardMsg(chat_id, chat_id, pos)
+                for _ in range(len(r) - 1):
+                    db.iteratePos(chat_id)
             except:
                 continue
-            if time.time() - datetime.timestamp(r.forward_date) < 10 * 60 * 60 * 24:
+            if len(r) == 1: # debug use only
                 db.rewindPos(chat_id)
-                r.delete()
-            else:
-                db.setTime(chat_id)
+                r.delete() # probably still not enough, let's see
+            db.setTime(chat_id)
             break
 
 def loop():
