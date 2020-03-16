@@ -60,8 +60,8 @@ def forwardMsg(reciever, sender, pos, bot, debug_group):
     print(all_pos)
     if not all_pos:
         try:
-            r = bot.forward_message(
-                chat_id = reciever, message_id = pos, from_chat_id = sender)
+            return [bot.forward_message(chat_id = reciever, 
+                message_id = pos, from_chat_id = sender)]
         except:
             return []
             
