@@ -10,7 +10,6 @@ from telegram_util import log_on_fail, splitCommand, autoDestroy
 from telegram import InputMediaPhoto
 from bs4 import BeautifulSoup
 import cached_url
-import sys
 
 START_MESSAGE = ('''
 Add this bot to your public channel, it will loop through the old message gradually 
