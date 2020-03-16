@@ -10,6 +10,7 @@ from telegram_util import log_on_fail, splitCommand, autoDestroy
 from telegram import InputMediaPhoto
 from bs4 import BeautifulSoup
 import cached_url
+import sys
 
 START_MESSAGE = ('''
 Add this bot to your public channel, it will loop through the old message gradually 
@@ -47,10 +48,16 @@ tele.dispatcher.add_handler(MessageHandler(~Filters.private, manage))
 tele.dispatcher.add_handler(MessageHandler(Filters.private, start))
 
 def getAllPos(link):
-    s = BeautifulSoup(cached_url.get(link), 'html.parser')
+    print('test' in str(sys.argv))
+    s = BeautifulSoup(cached_url.get(link + '?embed=1',
+        headers={
+            'referer': link,
+        }), 'html.parser')
     result = []
     for a in s.find_all('a', class_='grouped_media_wrap'):
-        result.append(int(a.get('href', '').strip().split('/')[-1]))
+        new_link = a.get('href', '').strip()
+        new_link = new_link.split('?')[0]
+        result.append(int(new_link.split('/')[-1]))
     return sorted(result)
 
 def forwardMsg(reciever, sender, pos, bot, debug_group):
