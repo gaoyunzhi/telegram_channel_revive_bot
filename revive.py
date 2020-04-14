@@ -11,6 +11,7 @@ from telegram import InputMediaPhoto
 from bs4 import BeautifulSoup
 import cached_url
 
+
 START_MESSAGE = ('''
 Add this bot to your public channel, it will loop through the old message gradually 
 if no activity in a set period of time.
