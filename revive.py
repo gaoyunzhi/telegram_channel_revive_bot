@@ -36,7 +36,6 @@ def manage(update, context):
         db.setInterval(chat_id, int(text))
         autoDestroy(msg.reply_text('success'), 0.1)
         msg.delete()
-        return
     db.setTime(chat_id)
 
 def start(update, context):
