@@ -56,6 +56,10 @@ def getAllPos(link):
     return sorted(result)
 
 def forwardMsg(reciever, sender, pos, bot, debug_group):
+    try:
+        tele.bot.get_chat(sender)
+    except:
+        return
     link = 'https://t.me/%s/%d' % \
         (tele.bot.get_chat(sender).username, pos)
     all_pos = getAllPos(link)
